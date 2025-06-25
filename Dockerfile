@@ -9,6 +9,8 @@ RUN apk update && apk add --no-cache ffmpeg python3 py3-pip curl \
 # Skopiuj czcionkę
 COPY fonts/apercumovistarbold.ttf /usr/share/fonts/truetype/apercumovistarbold.ttf
 
+COPY cookies/cookies.txt /app/cookies.txt
+
 USER node
 
 # Ustaw zmienne środowiskowe
