@@ -2,23 +2,26 @@ FROM n8nio/n8n
 
 USER root
 
-# Zainstaluj potrzebne pakiety i yt-dlp
+# Używamy apk bo to alpine, instalujemy potrzebne pakiety i yt-dlp z ignorowaniem ostrzeżeń
 RUN apk update && apk add --no-cache ffmpeg python3 py3-pip curl \
-  && pip3 install --break-system-packages --root-user-action=ignore yt-dlp
+  && pip3 install --break-system-packages --root-user-action=ignore -U yt-dlp
 
 # Skopiuj czcionkę
 COPY fonts/apercumovistarbold.ttf /usr/share/fonts/truetype/apercumovistarbold.ttf
 
-COPY cookies/cookies.txt /app/cookies.txt
+# Skopiuj cookies do /tmp (tam yt-dlp ma pewnie lepsze uprawnienia do zapisu)
+COPY cookies/cookies.txt /tmp/cookies.txt
+
+# Ustaw uprawnienia do pliku cookies (tylko właściciel może czytać i pisać)
+RUN chmod 600 /tmp/cookies.txt
 
 USER node
 
-# Ustaw zmienne środowiskowe
+# Zmienne środowiskowe
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 ENV N8N_PORT=5678
 
 EXPOSE 5678
 
-# Przywróć oryginalny entrypoint i komendę
 ENTRYPOINT ["tini", "--"]
 CMD ["n8n"]
