@@ -1,17 +1,23 @@
-FROM n8nio/n8n
+FROM node:20-alpine
 
-USER root
+# Ustaw katalog roboczy
+WORKDIR /app
 
-RUN apk update && apk add --no-cache ffmpeg python3 py3-pip curl \
-  && pip3 install --break-system-packages --root-user-action=ignore yt-dlp
+# Zainstaluj zależności systemowe
+RUN apk add --no-cache ffmpeg python3 py3-pip curl
 
-# Jeśli potrzebujesz czcionki, odkomentuj to i wrzuć plik do repo
+# Zainstaluj yt-dlp
+RUN pip3 install --break-system-packages --root-user-action=ignore yt-dlp
+
+# Zainstaluj n8n globalnie
+RUN npm install -g n8n
+
+# (Opcjonalnie) skopiuj czcionkę, jeśli masz
 COPY fonts/apercumovistarbold.ttf /usr/share/fonts/truetype/apercumovistarbold.ttf
 
-USER node
-
-ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+# Zmienna środowiskowa portu
 ENV N8N_PORT=5678
+ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
 EXPOSE 5678
 
